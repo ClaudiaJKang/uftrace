@@ -492,14 +492,17 @@ def run_single_case(case, flags, opts, arg):
     return result
 
 
-def save_test_result(result, case, shared):
+def save_test_result(result, case, arg, shared):
     shared.results[case] = result
     shared.progress += 1
     for r in result:
         shared.stats[r] += 1
         shared.total += 1
 
-    print_test_progress(shared.progress, shared.tests_count)
+    if not arg.sort:
+        print_test_result(case, result, arg.color)
+    else:
+        print_test_progress(shared.progress, shared.tests_count)
 
 
 def print_test_progress(prog, total, size=40):
@@ -508,18 +511,7 @@ def print_test_progress(prog, total, size=40):
     sys.stdout.flush()
 
 
-def print_test_result(case, result, color):
-    if sys.stdout.isatty() and color:
-        result_list = [colored_result[r] for r in result]
-    else:
-        result_list = [text_result[r] for r in result]
-
-    output = case[1:4]
-    output += ' %-20s' % case[5:] + ': ' + ' '.join(result_list) + '\n'
-    sys.stdout.write(output)
-
-
-def print_test_report(opts, flags, arg, shared):
+def print_test_header(opts, flags):
     optslen = len(opts)
 
     header1 = '%-24s ' % 'Test case'
@@ -534,12 +526,28 @@ def print_test_report(opts, flags, arg, shared):
     print(header1)
     print(header2)
 
-    from collections import OrderedDict
 
-    od = OrderedDict(sorted(shared.results.items()))
+def print_test_result(case, result, color):
+    if sys.stdout.isatty() and color:
+        result_list = [colored_result[r] for r in result]
+    else:
+        result_list = [text_result[r] for r in result]
 
-    for name, result in od.items():
-        print_test_result(name, result, arg.color)
+    output = case[1:4]
+    output += ' %-20s' % case[5:] + ': ' + ' '.join(result_list) + '\n'
+    sys.stdout.write(output)
+
+
+def print_test_report(opts, flags, arg, shared):
+    if arg.sort:
+        print_test_header(opts, flags)
+
+        from collections import OrderedDict
+
+        od = OrderedDict(sorted(shared.results.items()))
+
+        for name, result in od.items():
+            print_test_result(name, result, arg.color)
 
     success = shared.stats[TestBase.TEST_SUCCESS] + shared.stats[TestBase.TEST_SUCCESS_FIXED]
     percent = 100.0 * success / shared.total
@@ -579,6 +587,8 @@ def parse_argument():
                         help="suppress color in the output")
     parser.add_argument("-t", "--timeout", dest='timeout', default=5,
                         help="fail test if it runs more than TIMEOUT seconds")
+    parser.add_argument("-s", "--sort", dest='sort', action='store_true',
+                        help="show progress and print sorted result after all tests")
     parser.add_argument("-j", "--worker", dest='worker', type=int, default=multiprocessing.cpu_count(),
                         help="Parallel worker count; using all core for default")
 
@@ -635,12 +645,15 @@ if __name__ == "__main__":
 
     for tc in sorted(testcases):
         name = tc.split('.')[0]  # remove '.py'
-        clbk = partial(save_test_result, case=name, shared=shared)
+        clbk = partial(save_test_result, case=name, arg=arg, shared=shared)
         pool.apply_async(run_single_case,
                          args=[name, flags, opts.split(), arg],
                          callback=clbk)
 
     print("Start %s tests with %d worker" % (shared.tests_count, arg.worker))
+    if not arg.sort:
+        print_test_header(opts, flags)
+
     pool.close()
     pool.join()
 
