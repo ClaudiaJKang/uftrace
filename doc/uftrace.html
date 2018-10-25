@@ -1372,6 +1372,44 @@ class: code-26px
      321.521 us [117594] | } /* main */
 ```
 ---
+class: code-26px
+### Record function return values with type setting
+```
+    $ clang -pg hello.c
+    $ uftrace -A printf@arg1/s -R main@`retval` a.out 
+```
+---
+class: code-26px
+### Record function return values with type setting
+```
+    $ clang -pg hello.c
+    $ uftrace -A printf@arg1/s -R main@`retval` a.out     
+    Hello World!
+    # DURATION     TID     FUNCTION
+                [117594] | main() {
+     319.904 us [117594] |   printf("Hello World!\n");
+     321.521 us [117594] | } `= 0;` /* main */
+```
+---
+class: code-26px
+### Record function return values with type setting
+```
+    $ clang -pg hello.c
+    $ uftrace -A printf@arg1/s -R main@retval`/f` a.out
+```
+---
+class: code-26px
+### Record function return values with type setting
+```
+    $ clang -pg hello.c
+    $ uftrace -A printf@arg1/s -R main@retval`/f` a.out
+    Hello World!
+    # DURATION     TID     FUNCTION
+                [117594] | main() {
+     319.904 us [117594] |   printf("Hello World!\n");
+     321.521 us [117594] | } `= 0.000000;` /* main */
+```
+---
 name: autoargs
 template: title-layout
 ## Arguments Detection with Debug Info
