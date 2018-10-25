@@ -1230,6 +1230,25 @@ template: title-layout
 .footnote[[wiki/Tutorial:-Arguments](https://github.com/namhyung/uftrace/wiki/Tutorial:-Arguments)]
 
 ---
+class: code-18px
+### Display Function Arguments
+- uftrace can record function arguments and return values
+  - using the .red[-A]/.red[--argument] and .red[-R]/.red[--retval] options.
+
+```
+    <argument>    :=  <symbol> "@" <specs>
+    <specs>       :=  <spec> | <spec> "," <spec>
+    <spec>        :=  ( <int_spec> | <float_spec> | <ret_spec> )
+    <int_spec>    :=  "arg" N [ "/" <format> [ <size> ] ] [ "%" ( <reg> | <stack> ) ]
+    <float_spec>  :=  "fparg" N [ "/" ( <size> | "80" ) ] [ "%" ( <reg> | <stack> ) ]
+    <ret_spec>    :=  "retval" [ "/" <format> [ <size> ] ]
+    <format>      :=  "d" | "i" | "u" | "x" | "s" | "c" | "f" | "S" | "p"
+    <size>        :=  "8" | "16" | "32" | "64"
+    <reg>         :=  <arch-specific register name>  # "rdi", "xmm0", "r0", ...
+    <stack>       :=  "stack" [ "+" ] <offset>
+```
+
+---
 ### Display Function Arguments
 ```
     $ gcc -pg fibonacci.c
@@ -1354,25 +1373,6 @@ class: code-26px
      319.904 us [117594] |   printf(`"Hello World!\n"`);
      321.521 us [117594] | } /* main */
 ```
----
-class: code-18px
-### Display Function Arguments
-- uftrace can record function arguments and return values
-  - using the .red[-A]/.red[--argument] and .red[-R]/.red[--retval] options.
-
-```
-    <argument>    :=  <symbol> "@" <specs>
-    <specs>       :=  <spec> | <spec> "," <spec>
-    <spec>        :=  ( <int_spec> | <float_spec> | <ret_spec> )
-    <int_spec>    :=  "arg" N [ "/" <format> [ <size> ] ] [ "%" ( <reg> | <stack> ) ]
-    <float_spec>  :=  "fparg" N [ "/" ( <size> | "80" ) ] [ "%" ( <reg> | <stack> ) ]
-    <ret_spec>    :=  "retval" [ "/" <format> [ <size> ] ]
-    <format>      :=  "d" | "i" | "u" | "x" | "s" | "c" | "f" | "S" | "p"
-    <size>        :=  "8" | "16" | "32" | "64"
-    <reg>         :=  <arch-specific register name>  # "rdi", "xmm0", "r0", ...
-    <stack>       :=  "stack" [ "+" ] <offset>
-```
-
 ---
 name: autoargs
 template: title-layout
