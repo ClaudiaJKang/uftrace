@@ -555,7 +555,15 @@ name: lib-tracing
   - PLT contains trampoline code for calling shared functions
 
 ```
-    $ gcc -pg foobar.c
+  $ gcc -pg foobar.c
+```
+---
+### Library Function Tracing
+- Library Function Tracing works via PLT hooking
+  - PLT contains trampoline code for calling shared functions
+
+```
+  $ gcc -pg foobar.c
 ```
 
 .left-column[
@@ -599,9 +607,8 @@ int main() {
   - PLT contains trampoline code for calling shared functions
 
 ```
-    $ gcc -pg foobar.c
+  $ gcc -pg foobar.c
 ```
-
 .left-column[
 ```
 void bar() {
@@ -644,7 +651,9 @@ class: code-26px
   - PLT contains trampoline code for calling shared functions
 
 ```
-    $ gcc -pg foobar.c
+  $ gcc -pg foobar.c
+
+  $ uftrace a.out
 ```
 ---
 class: code-26px
@@ -653,31 +662,20 @@ class: code-26px
   - PLT contains trampoline code for calling shared functions
 
 ```
-    $ gcc -pg foobar.c
+  $ gcc -pg foobar.c
 
-    $ uftrace a.out
-```
----
-class: code-26px
-### Library Function Tracing
-- Library Function Tracing works via PLT hooking
-  - PLT contains trampoline code for calling shared functions
-
-```
-    $ gcc -pg foobar.c
-
-    $ uftrace a.out
-    # DURATION     TID     FUNCTION
-                [112962] | main() {
-                [112962] |   foo() {
-                [112962] |     bar() {
-       0.863 us [112962] |       `getpid`();
-       1.774 us [112962] |     } /* bar */
-       2.334 us [112962] |   } /* foo */
-                [112962] |   bar() {
-       0.176 us [112962] |     `getpid`();
-       0.666 us [112962] |   } /* bar */
-       3.663 us [112962] | } /* main */
+  $ uftrace a.out
+  # DURATION     TID     FUNCTION
+              [112962] | main() {
+              [112962] |   foo() {
+              [112962] |     bar() {
+     0.863 us [112962] |       `getpid`();
+     1.774 us [112962] |     } /* bar */
+     2.334 us [112962] |   } /* foo */
+              [112962] |   bar() {
+     0.176 us [112962] |     `getpid`();
+     0.666 us [112962] |   } /* bar */
+     3.663 us [112962] | } /* main */
 ```
 ---
 class: code-26px
@@ -687,20 +685,20 @@ class: code-26px
 
 
 ```
-    $ gcc -pg foobar.c
+  $ gcc -pg foobar.c
 
-    $ uftrace `--no-libcall` a.out
-    # DURATION     TID     FUNCTION
-                [112962] | main() {
-                [112962] |   foo() {
-                [112962] |     bar() {
-//       0.863 us [112962] |       getpid();
-       1.774 us [112962] |     } /* bar */
-       2.334 us [112962] |   } /* foo */
-                [112962] |   bar() {
-//       0.176 us [112962] |     getpid();
-       0.666 us [112962] |   } /* bar */
-       3.663 us [112962] | } /* main */
+  $ uftrace `--no-libcall` a.out
+  # DURATION     TID     FUNCTION
+              [112962] | main() {
+              [112962] |   foo() {
+              [112962] |     bar() {
+//    0.863 us [112962] |       getpid();
+     1.774 us [112962] |     } /* bar */
+     2.334 us [112962] |   } /* foo */
+              [112962] |   bar() {
+//     0.176 us [112962] |     getpid();
+     0.666 us [112962] |   } /* bar */
+     3.663 us [112962] | } /* main */
 ```
 ---
 class: code-26px
@@ -710,16 +708,16 @@ class: code-26px
 
 
 ```
-    $ gcc -pg foobar.c
+  $ gcc -pg foobar.c
 
-    $ uftrace `--no-libcall` a.out
-    # DURATION     TID     FUNCTION
-                [112962] | main() {
-                [112962] |   foo() {
-       1.774 us [112962] |     bar();
-       2.334 us [112962] |   } /* foo */
-       0.666 us [112962] |   bar();
-       3.663 us [112962] | } /* main */
+  $ uftrace `--no-libcall` a.out
+  # DURATION     TID     FUNCTION
+              [112962] | main() {
+              [112962] |   foo() {
+     1.774 us [112962] |     bar();
+     2.334 us [112962] |   } /* foo */
+     0.666 us [112962] |   bar();
+     3.663 us [112962] | } /* main */
 ```
 ---
 class: code-26px
